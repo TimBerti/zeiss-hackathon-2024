@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-websocket_url = "ws://public-ties-sniff.loca.lt/:8765/"
+websocket_url = "ws://0.0.0.0:8765/"
 
 def to_matrix(data):
     values = np.array(data)

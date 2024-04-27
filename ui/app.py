@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import math
 import time
 
 API_URL = 'http://localhost:5000/data'

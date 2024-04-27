@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Free Desks</title>
+    </head>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        #plantable td {
+            border: 1px solid black;
+            background-color: #ccc;
+            margin: 1ex;
+            padding: 1em;
+        }
+    </style>
+    <script>
+        const status_colors = [
+            "#0c0",
+            "#c00",
+            "#ff0",
+        ];
+        const desk_tds = [];
+
+        function setup() {
+            const plantable = document.getElementById("plantable");
+
+            const row_count = 3;
+            const col_count = 2;
+
+            for (let row = 0; row < row_count; row += 1) {
+                const tr = document.createElement("tr");
+                for (let col = 0; col < col_count; col += 1) {
+                    const desk_id = row * col_count + col;
+                    const td = document.createElement("td");
+                    td.innerText = `Desk #${desk_id}`;
+                    td.addEventListener("click", () => {
+                        fetch(`/reserve/${desk_id}`);
+                    });
+                    tr.appendChild(td);
+                    desk_tds.push(td);
+                }
+                plantable.appendChild(tr);
+            }
+        }
+
+        function update() {
+            fetch("/statusmask").then(response => {
+                return response.json();
+            }).then(payload => {
+                const data = payload["data"];
+                for (let i = 0; i < data.length; i += 1) {
+                    const status = data[i];
+                    const style = desk_tds[i].style;
+                    style.backgroundColor = status_colors[status];
+                    if (status == 0) {
+                        style.cursor = "pointer";
+                    } else {
+                        style.cursor = "not-allowed";
+                    }
+                }
+            }).catch(reason => {
+                console.log("failed", reason);
+            })            
+        }
+
+        window.addEventListener("DOMContentLoaded", function() {
+            setup();
+            window.setInterval(update, 1000);
+        });
+    </script>
+    <body>
+        <h1>Free Desks</h1>
+        <table id="plantable"></table>
+    </body>
+</html>

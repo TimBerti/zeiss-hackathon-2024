@@ -2,6 +2,12 @@
 
 Topic: Free desk reporting
 
+## Web App
+
+```sh
+flask --app webapp run
+```
+
 ## Event Info
 
 Reveal the Invisible -

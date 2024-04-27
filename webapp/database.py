@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 import time
 
-RESERVATION_MAX_AGE_SECONDS = 5 * 60
+RESERVATION_MAX_AGE_SECONDS = 30
 
 
 class NoSuchDeskException(LookupError):
@@ -19,11 +19,26 @@ class Status(Enum):
 
 @dataclass
 class Record:
-    status: Status = Status.Free
+    _status: Status = Status.Free
     timestamp: float = 0
 
+    @property
+    def status(self) -> Status:
+        self._drop_expired_reservation()
+        return self._status
 
-db: list[Record] = [Record() for _ in range(6)]
+    @status.setter
+    def status(self, status: Status | int):
+        self._status = Status(status)
+        self.timestamp = time.time()
+
+    def _drop_expired_reservation(self):
+        timestamp_expiry = time.time() - RESERVATION_MAX_AGE_SECONDS
+        if self._status == Status.Reserved and self.timestamp < timestamp_expiry:
+            self.status = Status.Free
+
+
+db: list[Record] = [Record() for i in range(8)]
 
 
 def get_record(desk_id: int) -> Record:
@@ -32,34 +47,20 @@ def get_record(desk_id: int) -> Record:
     return db[desk_id]
 
 
-def drop_expired_reservation(record: Record):
-    timestamp_expiry = time.time() + RESERVATION_MAX_AGE_SECONDS
-    if record.status == Status.Reserved and record.timestamp < timestamp_expiry:
-        record.status = Status.Free
-
-
-def drop_expired_reservations():
-    for record in db:
-        drop_expired_reservation(record)
-
-
 def make_reservation(desk_id: int):
     record = get_record(desk_id)
-    drop_expired_reservation(record)
     if record.status != Status.Free:
         raise DeskUnavailableException(desk_id)
     record.status = Status.Reserved
 
 
 def get_status_mask() -> list[int]:
-    drop_expired_reservations()
     return [record.status.value for record in db]
 
 
 def set_status(desk_id: int, status: Status) -> bool:
     assert isinstance(status, Status)
     record = get_record(desk_id)
-    drop_expired_reservation(record)
     if status == Status.Free and record.status == Status.Reserved:
         return False
     record.status = status
@@ -68,4 +69,4 @@ def set_status(desk_id: int, status: Status) -> bool:
 
 def set_status_mask(mask: list[int]):
     for desk_id, status_int in enumerate(mask):
-        set_status(desk_id, status_int)
+        set_status(desk_id, Status(status_int))

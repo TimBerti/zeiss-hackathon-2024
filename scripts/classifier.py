@@ -37,7 +37,7 @@ class Classifier:
         return classifications
     
 if __name__ == '__main__':
-    classifier = Classifier('../models/ResNet18_pretrained-epoch19-accuracy0.8884.pt', '../data/raw_data/')
+    classifier = Classifier('../models/ResNet18_pretrained-epoch5-accuracy0.9018.pt', '../data/raw_data/')
     classifications = classifier.classify('saved_pypylon_img_1714253425.png')
     for i in range(4):
         print(classifications[2*i], classifications[2*i+1])

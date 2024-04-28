@@ -19,10 +19,18 @@
 
         var timeout = null;
 
+        const Status = {
+            Absent: 0,
+            Free: 1,
+            Occupied: 2,
+            Reserved: 3,
+        };
+
         const status_colors = [
-            "#0c0",
-            "#c00",
-            "#ff0",
+            "#c09", // absent
+            "#0c0", // free
+            "#c00", // occupied
+            "#ff0", // reserved
         ];
         const desk_tds = [];
 
@@ -62,7 +70,7 @@
                     const status = data[i];
                     const style = desk_tds[i].style;
                     style.backgroundColor = status_colors[status];
-                    if (status == 0) {
+                    if (status == Status.Free) {
                         style.cursor = "pointer";
                     } else {
                         style.cursor = "not-allowed";

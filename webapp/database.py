@@ -12,9 +12,17 @@ class DeskUnavailableException(Exception):
     pass
 
 class Status(Enum):
-    Free = 0
-    Occupied = 1
-    Reserved = 2
+    Absent = 0
+    Free = 1
+    Occupied = 2
+    Reserved = 3
+
+
+STATUS_TRANSLATION_MAP: dict[str | int, Status] = {
+    name.lower(): status for (name, status) in Status._member_map_.items()
+} | {
+    status.value: status for (name, status) in Status._member_map_.items()
+}
 
 
 @dataclass
@@ -29,7 +37,10 @@ class Record:
 
     @status.setter
     def status(self, status: Status | int):
-        self._status = Status(status)
+        status = Status(status)
+        if self._status == status:
+            return
+        self._status = status
         self.timestamp = time.time()
 
     def _drop_expired_reservation(self):
@@ -67,6 +78,6 @@ def set_status(desk_id: int, status: Status) -> bool:
     return True
 
 
-def set_status_mask(mask: list[int]):
+def set_status_mask(mask: list[int | str]):
     for desk_id, status_int in enumerate(mask):
-        set_status(desk_id, Status(status_int))
+        set_status(desk_id, STATUS_TRANSLATION_MAP[status_int])

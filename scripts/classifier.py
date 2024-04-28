@@ -1,6 +1,7 @@
 import torch
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
 import os
 from torchvision.transforms import v2
 from transform_split import transform, split_image
@@ -55,7 +56,7 @@ class Classifier:
         return adjusted_image
     
 if __name__ == '__main__':
-    classifier = Classifier('../models/ResNet18_pretrained-accuracy0.9226.pt', '../data/raw_data/')
-    classifications = classifier.classify('saved_pypylon_img_1714253425.png')
+    classifier = Classifier('../models/ResNet18_pretrained-accuracy0.9226.pt', '../images')
+    classifications = classifier.classify('saved_pypylon_img_1714289587.png')
     for i in range(4):
         print(classifications[2*i], classifications[2*i+1])

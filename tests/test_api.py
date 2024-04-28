@@ -2,7 +2,7 @@ import unittest
 import requests
 
 class TestAPI(unittest.TestCase):
-    test_data = [[0, 1, 0, 0, 1, 0], [1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]]
+    test_data = [[0, 1, 0, 0, 1, 0, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0]]
     def setUp(self):
         self.base_url = "http://0.0.0.0:5000"
 

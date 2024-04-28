@@ -1,0 +1,8 @@
+dependencies:
+  - matplotlib
+  - numpy
+  - opencv
+  - pandas
+  - requests
+  - seaborn
+  - streamlit

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Free Desks</title>
+    </head>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        #plantable td {
+            border: 1px solid black;
+            background-color: #ccc;
+            margin: 1ex;
+            padding: 1em;
+        }
+    </style>
+    <script>
+        var timeout = null;
+
+        const status_colors = [
+            "#0c0",
+            "#c00",
+            "#ff0",
+        ];
+        const desk_tds = [];
+
+        async function setup() {
+            const plantable = document.getElementById("plantable");
+            const chaircount = (await (await fetch("/statusmask")).json())["data"].length;
+
+            const col_count = 2;
+            const row_count = chaircount / col_count;
+
+            for (let row = 0; row < row_count; row += 1) {
+                const tr = document.createElement("tr");
+                for (let col = 0; col < col_count; col += 1) {
+                    const desk_id = row * col_count + col;
+                    const td = document.createElement("td");
+                    td.innerText = `Desk #${desk_id}`;
+                    td.addEventListener("click", () => {
+                        fetch(`/reserve/${desk_id}`).then(response => response.json()).then(json => {
+                            update_restart();
+                        }).catch(console.log);
+                    });
+                    tr.appendChild(td);
+                    desk_tds.push(td);
+                }
+                plantable.appendChild(tr);
+            }
+
+            update();
+        }
+
+        function update() {
+            fetch("/statusmask").then(response => {
+                return response.json();
+            }).then(payload => {
+                const data = payload["data"];
+                for (let i = 0; i < data.length; i += 1) {
+                    const status = data[i];
+                    const style = desk_tds[i].style;
+                    style.backgroundColor = status_colors[status];
+                    if (status == 0) {
+                        style.cursor = "pointer";
+                    } else {
+                        style.cursor = "not-allowed";
+                    }
+                }
+            }).catch(reason => {
+                console.log("failed", reason);
+            })
+            timeout = window.setTimeout(update, 1000);
+        }
+
+        function update_restart() {
+            window.clearTimeout(timeout);
+            update();
+        }
+
+        window.addEventListener("DOMContentLoaded", function() {
+            setup();
+        });
+    </script>
+    <body>
+        <h1>Free Desks</h1>
+        <table id="plantable"></table>
+    </body>
+</html>

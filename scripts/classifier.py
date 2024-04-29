@@ -16,15 +16,13 @@ torch_transform = v2.Compose([
 class Classifier:
     classes = {0: 'absent', 1: 'free', 2: 'occupied'}
 
-    def __init__(self, model_path, root_dir):
+    def __init__(self, model_path):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = torch.load(model_path)
         self.model.to(self.device)
         self.model.eval()
-        self.root_dir = root_dir
 
-    def classify(self, filename):
-        img = cv.imread(os.path.join(self.root_dir, filename))
+    def classify(self, img):
         img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
         img = self.adjust_lighting(img)
         img = transform(img)
@@ -56,7 +54,9 @@ class Classifier:
         return adjusted_image
     
 if __name__ == '__main__':
-    classifier = Classifier('../models/ResNet18_pretrained-accuracy0.9226.pt', '../images')
-    classifications = classifier.classify('saved_pypylon_img_1714289587.png')
+    root_dir = '../images'
+    img = cv.imread(root_dir + 'saved_pypylon_img_1714289587.png')
+    classifier = Classifier('../models/ResNet18_pretrained-accuracy0.9226.pt')
+    classifications = classifier.classify(img)
     for i in range(4):
         print(classifications[2*i], classifications[2*i+1])

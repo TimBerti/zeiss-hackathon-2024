@@ -39,12 +39,12 @@ Implement a system that monitors seating availability from above, classifying ea
 
 With this approach, we aim to enhance user experience and manage seating capacity effectively, all while upholding data privacy standards.
 
-![Solution Architecture](readme_images\solution.png "image showing the architecture of our solution")
+![Solution Architecture](readme_images/solution.png "image showing the architecture of our solution")
 
 ### Dataset
 To optimize our ResNet-18 classifier, we dedicated to create our own dataset tailored to the specific usecase. This dataset includes a collection of 1.120 images, capturing a table with eight seats under a multitude of scenarios, showcasing a diverse range of combinations where seats are either occupied, vacant, or marked as absent by leaving things on the table or a jacket on the chair. An exemplary sample of our sample can be seen below.
 
-![Dataset Sample](readme_images\dataset_example.png "image showing an example of our own dataset")
+![Dataset Sample](readme_images/dataset_example.png "image showing an example of our own dataset")
 
 ### Training Process
 
@@ -54,17 +54,17 @@ The graphic below illustrates the training process we employed to develop our se
 2. Subsequently, each seat image undergoes a manual labeling process. During this phase, we categorize them into three distinct statuses: occupied, absent, and free.
 3. With the dataset prepared and labeled, it then serves as the input for the fine-tuning of our ResNet-18 classifier. Through this fine-tuning process, we refine the classifier with our specific dataset, ultimately producing a set of new model weights.
 
-![Training Process](readme_images\train_process.png "image showing our training process")
+![Training Process](readme_images/train_process.png "image showing our training process")
 
 ### Hardware Design
 To seamlessly integrate the hardware components, such as the Jetson Nano and camera, into a single device, we designed our own casing utilizing 3D printing techniques. In the process we incorporated the flexibility to adjust the camera angle, allowing for optimal field-of-view adjustments to suit various monitoring environments. This customizable feature ensures our system can adapt to different seating arrangements and room layouts with ease.
 
-![Custom Hardware Design](readme_images\hardware.png "image showing our devices hardware with custom 3d printed casing")
+![Custom Hardware Design](readme_images/hardware.png "image showing our devices hardware with custom 3d printed casing")
 
 ### Web App
 Our web application presents a real-time overview of seating arrangements, providing updates on the occupancy status with clear indicators for seats that are occupied (red), absent (orange), or free (green). Below is a screenshot demonstrating the app's interface and functionality.
 
-![Web App Screenshot](readme_images\web_app.png "image showing a screenshot of our web app")
+![Web App Screenshot](readme_images/web_app.png "image showing a screenshot of our web app")
 
 Command to start the Web App:
 ```sh

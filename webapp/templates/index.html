@@ -2,16 +2,26 @@
 <html>
     <head>
         <title>Free Desks</title>
+        <meta name="viewport" content="width=device-width, initial-scale=0.8">
     </head>
     <style>
         body {
             font-family: sans-serif;
+            text-align: center;
         }
-        #plantable td {
+        #plantable {
+            margin: 1em auto;
+        }
+        #plantable div {
             border: 1px solid black;
             background-color: #ccc;
             margin: 1ex;
             padding: 1em;
+        }
+        #plantable div.chair {
+            margin: 1ex auto;
+            width: 1ex;
+            height: 1ex;
         }
     </style>
     <script>
@@ -19,33 +29,51 @@
 
         var timeout = null;
 
+        const Status = {
+            Absent: 0,
+            Free: 1,
+            Occupied: 2,
+            Reserved: 3,
+        };
+
         const status_colors = [
-            "#0c0",
-            "#c00",
-            "#ff0",
+            "#c90", // absent
+            "#0c0", // free
+            "#c00", // occupied
+            "#ff0", // reserved
         ];
         const desk_tds = [];
 
         async function setup() {
             const plantable = document.getElementById("plantable");
             const chaircount = (await (await fetch(URL_PREFIX + "/statusmask")).json())["data"].length;
-
-            const col_count = 2;
+            const col_count = 4;
             const row_count = chaircount / col_count;
 
             for (let row = 0; row < row_count; row += 1) {
                 const tr = document.createElement("tr");
                 for (let col = 0; col < col_count; col += 1) {
-                    const desk_id = row * col_count + col;
+                    const desk_id = (col_count - col - 1) * 2 + row;
                     const td = document.createElement("td");
-                    td.innerText = `Desk #${desk_id}`;
+                    const div_chair = document.createElement("div");
+                    const div_table = document.createElement("div");
+                    div_chair.className = "chair";
+                    div_table.className = "table";
+                    div_table.innerText = `Desk #${desk_id}`;
                     td.addEventListener("click", () => {
                         fetch(`${URL_PREFIX}/reserve/${desk_id}`).then(response => response.json()).then(json => {
                             update_restart();
                         }).catch(console.log);
                     });
+                    if (row % 2 == 0) {
+                        td.appendChild(div_chair);
+                        td.appendChild(div_table);
+                    } else {
+                        td.appendChild(div_table);
+                        td.appendChild(div_chair);
+                    }
                     tr.appendChild(td);
-                    desk_tds.push(td);
+                    desk_tds[desk_id] = td;
                 }
                 plantable.appendChild(tr);
             }
@@ -62,7 +90,7 @@
                     const status = data[i];
                     const style = desk_tds[i].style;
                     style.backgroundColor = status_colors[status];
-                    if (status == 0) {
+                    if (status == Status.Free) {
                         style.cursor = "pointer";
                     } else {
                         style.cursor = "not-allowed";

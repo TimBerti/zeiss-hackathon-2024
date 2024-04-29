@@ -1,5 +1,7 @@
 import torch
 import cv2 as cv
+import numpy as np
+import matplotlib.pyplot as plt
 import os
 from torchvision.transforms import v2
 from transform_split import transform, split_image
@@ -23,6 +25,8 @@ class Classifier:
 
     def classify(self, filename):
         img = cv.imread(os.path.join(self.root_dir, filename))
+        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        img = self.adjust_lighting(img)
         img = transform(img)
         parts = split_image(img)
         classifications = []
@@ -36,8 +40,23 @@ class Classifier:
             classifications.append(self.classes[label])
         return classifications
     
+    def adjust_lighting(self, img, target_brightness=86.031, target_color=[98.981, 95.423, 62.651]):
+        gray_image = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        current_brightness = gray_image.mean()
+
+        brightness_offset = target_brightness - current_brightness
+        img = cv.add(img, np.array([brightness_offset]))
+
+        average_color_per_row = np.average(img, axis=0)
+        current_color = np.average(average_color_per_row, axis=0)
+
+        color_diff = target_color - current_color
+
+        adjusted_image = cv.add(img, np.array([color_diff]))
+        return adjusted_image
+    
 if __name__ == '__main__':
-    classifier = Classifier('../models/ResNet18_pretrained-accuracy0.9226.pt', '../data/raw_data/')
-    classifications = classifier.classify('saved_pypylon_img_1714253425.png')
+    classifier = Classifier('../models/ResNet18_pretrained-accuracy0.9226.pt', '../images')
+    classifications = classifier.classify('saved_pypylon_img_1714289587.png')
     for i in range(4):
         print(classifications[2*i], classifications[2*i+1])
